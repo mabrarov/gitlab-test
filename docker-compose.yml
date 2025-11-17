@@ -1,0 +1,38 @@
+volumes:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:latest
+    shm_size: 256m
+    container_name: gitlab
+    hostname: dev.localdomain.local
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |-
+        external_url 'http://dev.localdomain.local:8929'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2424
+    ports:
+      - "8929:8929"
+      - "8443:443"
+      - "2424:2424"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "dev.localdomain.local:127.0.0.1"
+    volumes:
+      - type: volume
+        source: gitlab-config
+        target: /etc/gitlab
+        volume:
+          nocopy: true
+      - type: volume
+        source: gitlab-logs
+        target: /var/log/gitlab
+        volume:
+          nocopy: true
+      - type: volume
+        source: gitlab-data
+        target: /var/opt/gitlab
+        volume:
+          nocopy: true
